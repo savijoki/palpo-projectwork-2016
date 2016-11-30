@@ -1,14 +1,18 @@
 from django.db import models
 
-# Create your models here.
+
 
 class Movie(models.Model):
-    imdbId = models.CharField(max_length=32, blank=False, primary_key=True)
+
+    imdbid = models.CharField(max_length=32, blank=False, unique=True)
     title = models.CharField(max_length=256,  blank=False)
 
 class Trailer(models.Model):
-    movie = models.ForeignKey(Movie,on_delete=models.CASCADE,null=False)
-    embed = models.TextField(blank=False)
+    movie = models.ForeignKey(Movie, related_name='trailers', on_delete=models.CASCADE, null=False)
+    embed = models.TextField(blank=False, unique=True)
+
+    def __unicode__(self):
+        return self.embed
 
 class SearchQuery(models.Model):
     # save all queries in lower case

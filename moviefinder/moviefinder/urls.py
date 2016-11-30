@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from rest_api.viewsets import SearchQueryHandler
+from rest_api.viewsets import SearchByTitle, SearchByImdbId
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/search/?$', SearchQueryHandler, name='search')
+    url(r'^api/search/title/?$', SearchByTitle.as_view()),
+    url(r'^api/search/imdbId/?$', SearchByImdbId.as_view()),
 ]
