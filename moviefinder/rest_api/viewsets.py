@@ -2,15 +2,17 @@ import os
 import json
 import requests
 from pprint import pprint
-from django.http import JsonResponse
-from rest_framework.response import Response
+from datetime import  timedelta
 from django.db import transaction
-from rest_api.models import Movie, SearchQuery, Trailer
+from django.db.models import Count
+from django.db import IntegrityError
+from django.http import JsonResponse
+from django.utils import timezone
 from requests.exceptions import RequestException
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_api.models import Movie, SearchQuery, Trailer
 from rest_api.serializers import MovieSerializer
-from rest_framework import generics,mixins,views
-from django.db import IntegrityError
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -57,6 +59,26 @@ class SearchByImdbId(APIView):
         return JsonResponse(json.dumps({}), safe=False, status=400)
 
 
+class SearchTopSearches(APIView):
+
+    def get(self, request, *args, **kwargs):
+        days = 30
+        try:
+            days = abs(int(request.GET.get('days', 30)))
+        except ValueError as e:
+            pass
+        from_date = timezone.now() - timedelta(days=days)
+        top_queries = SearchQuery.objects.filter(search_time__gt=from_date, movie__isnull=False)\
+            .values('movie').annotate(sum=Count('query')).order_by('-sum')
+        movie_list = []
+        for query in top_queries:
+            movie = Movie.objects.get(pk=int(query['movie']))
+            movie_json = movie.as_json()
+            movie_json['searches'] = query['sum']
+            movie_list.append(movie_json)
+        return JsonResponse(json.dumps(movie_list), safe=False)
+
+
 def search_and_save_movie(query, count, type):
     retval  = None
     sid = transaction.savepoint()
@@ -78,12 +100,13 @@ def search_and_save_movie(query, count, type):
         else:
             title = movie_local[0].title
             imdbId = movie_local[0].imdbid
-        query_db = SearchQuery(query=imdbId)
+        query_db = SearchQuery(query=query)
         movie_db, created = Movie.objects.get_or_create(imdbid=imdbId, title=title)
         query_db.movie = movie_db
         if created or count > len(Trailer.objects.filter(movie=movie_db)):
             myapifilms_res = requests.get(
-                'http://www.myapifilms.com/trailerAddict/taapi?idIMDB=%s&token=%s&featured=&count=%d&credit=&format=json' %
+                'http://www.myapifilms.com/trailerAddict/taapi?idIMDB=%s&'
+                'token=%s&featured=&count=%d&credit=&format=json' %
                 (imdbId, myapifilms_token, count)).json()
             try:
                 trailers = myapifilms_res['data']['trailer']

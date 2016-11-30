@@ -7,6 +7,7 @@ class TrailerSerializer(serializers.ModelSerializer):
         model = Trailer
         fields = ('embed',)
 
+
 class MovieSerializer(serializers.ModelSerializer):
     trailers = TrailerSerializer(many=True)
 
