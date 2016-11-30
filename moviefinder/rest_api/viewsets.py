@@ -41,8 +41,8 @@ class SearchByTitle(APIView):
                 imdbId = omdb_res_json['imdbID']
                 title = omdb_res_json['Title']
                 movie_db, created = Movie.objects.get_or_create(imdbid=imdbId,title=title)
+                query_db.movie = movie_db
                 if created or count > len(Trailer.objects.filter(movie=movie_db)):
-                    query_db.movie = movie_db
                     myapifilms_res = requests.get(
                         'http://www.myapifilms.com/trailerAddict/taapi?idIMDB=%s&token=%s&featured=&count=%d&credit=&format=json' %
                         (imdbId, myapifilms_token, count)).json()
@@ -87,8 +87,8 @@ class SearchByImdbId(APIView):
                 imdbId = omdb_res_json['imdbID']
                 title = omdb_res_json['Title']
                 movie_db, created = Movie.objects.get_or_create(imdbid=imdbId, title=title)
+                query_db.movie = movie_db
                 if created or count > len(Trailer.objects.filter(movie=movie_db)):
-                    query_db.movie = movie_db
                     myapifilms_res = requests.get(
                         'http://www.myapifilms.com/trailerAddict/taapi?idIMDB=%s&token=%s&featured=&count=%d&credit=&format=json' %
                         (imdbId, myapifilms_token, count)).json()
