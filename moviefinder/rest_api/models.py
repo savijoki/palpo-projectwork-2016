@@ -16,10 +16,15 @@ class Movie(models.Model):
 
 class Trailer(models.Model):
     movie = models.ForeignKey(Movie, related_name='trailers', on_delete=models.CASCADE, null=False)
-    embed = models.TextField(blank=False, unique=True)
+    trailerid = models.IntegerField(unique=True)
+    embed = models.TextField(blank=False)
+    added = models.DateTimeField(auto_now_add=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.embed
+
+    class Meta:
+        ordering = ['movie', 'added', 'trailerid']
 
 class SearchQuery(models.Model):
     # save all queries in lower case

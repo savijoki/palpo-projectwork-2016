@@ -39,7 +39,7 @@ class SearchByTitle(APIView):
             return JsonResponse(json.dumps({}), safe=False, status=400)
         movie_db = search_and_save_movie(query, count, QueryType.TITLE)
         if movie_db is not None:
-            serializer = MovieSerializer(movie_db)
+            serializer = MovieSerializer(movie_db, trailer_amount=count)
             return Response(serializer.data)
         return JsonResponse(json.dumps({}), safe=False, status=400)
 
@@ -54,7 +54,7 @@ class SearchByImdbId(APIView):
 
         movie_db = search_and_save_movie(imdbId, count, QueryType.IMDBID)
         if movie_db is not None:
-            serializer = MovieSerializer(movie_db)
+            serializer = MovieSerializer(movie_db, trailer_amount=count)
             return Response(serializer.data)
         return JsonResponse(json.dumps({}), safe=False, status=400)
 
@@ -69,7 +69,7 @@ class SearchTopSearches(APIView):
             pass
         from_date = timezone.now() - timedelta(days=days)
         top_queries = SearchQuery.objects.filter(search_time__gt=from_date, movie__isnull=False)\
-            .values('movie').annotate(sum=Count('query')).order_by('-sum')
+            .values('movie').annotate(sum=Count('query')).order_by('-sum')[:10]
         movie_list = []
         for query in top_queries:
             movie = Movie.objects.get(pk=int(query['movie']))
@@ -112,10 +112,14 @@ def search_and_save_movie(query, count, type):
                 trailers = myapifilms_res['data']['trailer']
                 for trailer in trailers:
                     try:
-                        trailer_db = Trailer(movie=movie_db, embed=trailer['embed'])
+                        trailer_db = Trailer(movie=movie_db, trailerid=int(trailer['trailer_id']),
+                                             embed=trailer['embed'])
                         trailer_db.save()
                     except IntegrityError:
                         # unique constraint violation
+                        pass
+                    except KeyError as e:
+                        # trailer_id wasn't integer
                         pass
             except KeyError as e:
                 pass
