@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+        function searchTrailers()
+        {
+            var searchType = document.getElementById('search_type').selectedIndex;
+            var searchAmountSelect = document.getElementById('trailer_amount');
+            var searchAmount = searchAmountSelect[searchAmountSelect.selectedIndex].value;
+            var searchArea = document.getElementById('search_input');
+            var searchText = searchArea.value;
+            var url = ( searchType == '0' ? "/api/search/title" : "/api/search/imdbId");
+            $.ajax({
+                'url' : url,
+                'type' : 'GET',
+                'dataType': 'json',
+                'data' : {
+                    'query' : searchText,
+                    'count' : searchAmount
+                },
+                'success' : function (data) {
+                    var trailers_are = document.getElementById('trailers_area');
+                    trailers_are.innerHTML = "";
+                    for (var trailer in data['trailers'])
+                    {
+                        trailers_are.innerHTML += data['trailers'][trailer]['embed'];
+                    }
+                    var top10DateRangeSelect = document.getElementById('top10_daterange');
+                    var top10DateRangeSelectValue = top10DateRangeSelect[top10DateRangeSelect.selectedIndex].value;
+                    getTop10(top10DateRangeSelectValue);
+                }
+            });
+        }
+        function getTop10(days)
+        {
+            console.log(days);
+            $.ajax({
+                'url' : '/api/search/top',
+                'type' : 'GET',
+                'dataType': 'json',
+                'data' : {
+                    'query' : days
+                },
+                'success' : function (data) {
+                    var top10_area = document.getElementById('top10_searches');
+                    top10_area.innerHTML = "";
+                    data = $.parseJSON(data);
+                    for (var movie in data)
+                    {
+                        top10_area.innerHTML += "<b>" + data[movie]['title'] + ", Searched " + data[movie]['searches'] + " times.</b><br>";
+                    }
+                }
+            });
+        }
+        function getDays(index)
+        {
+            var top10DateRangeSelect = document.getElementById('top10_daterange');
+            return top10DateRangeSelectValue = top10DateRangeSelect[index].value;
+        }
+    </script>
+</head>
+<body onload="getTop10(7)">
+<div class="row">
+    <div class="col-xs-12 col-md-8">
+        <select id="search_type">
+            <option selected value="0">Movie name</option>
+            <option value="1">ImdbId</option>
+        </select>
+        <select id="trailer_amount">
+            <option selected disabled value="1">Amount of trailers</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <input type="text" id="search_input" placeholder="Search query"/>
+        <button onclick="searchTrailers()" type="button" class="btn btn-primary">Search</button>
+        <br>
+        <div id="trailers_area"></div>
+    </div>
+    <div class="col-xs-12 col-md-4">
+        <select onchange="getTop10(getDays(this.selectedIndex))" id="top10_daterange">
+            <option selected value="7">7 days</option>
+            <option value="14">14 days</option>
+            <option value="30">30 days</option>
+            <option value="90">90 days</option>
+            <option value="180">180 days</option>
+        </select>
+        <h4>Top 10 searches:</h4>
+        <div id="top10_searches"></div>
+    </div>
+</div>
+</body>
+</html>
