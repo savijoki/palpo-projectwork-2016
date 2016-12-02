@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_api.models import Movie, Trailer
-from pprint import pprint
 
 
 class TrailerSerializer(serializers.ModelSerializer):
