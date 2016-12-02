@@ -1,7 +1,8 @@
 import os
 import json
 import requests
-from pprint import pprint
+import logging
+import traceback
 from datetime import  timedelta
 from django.db import transaction
 from django.db.models import Count
@@ -14,7 +15,7 @@ from rest_framework.response import Response
 from rest_api.models import Movie, SearchQuery, Trailer
 from rest_api.serializers import MovieSerializer
 
-
+logger = logging.getLogger(__name__)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CONF_DIR = os.path.join(BASE_DIR,'conf')
 CONF_FILE =  os.path.join(CONF_DIR,'settings.ini')
@@ -30,7 +31,6 @@ class QueryType:
 
 
 class SearchByTitle(APIView):
-    serializer_class = MovieSerializer
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('query', None)
@@ -117,20 +117,23 @@ def search_and_save_movie(query, count, type):
                         trailer_db.save()
                     except IntegrityError:
                         # unique constraint violation
-                        pass
-                    except KeyError as e:
-                        # trailer_id wasn't integer
-                        pass
-            except KeyError as e:
-                pass
+                        logger.info("Tried to add same trailer %d to db." % int(trailer['trailer_id']))
+                    except (ValueError, KeyError):
+                        # trailer_id wasn't integer or key didn't exists
+                        logger.warning("Problem with myapifilms API. "
+                                       "Didn't provide some key or tailerid wasn't integer.")
+                        logger.warning(traceback.print_exc())
+            except KeyError:
+                logger.warning("Myapifilms API didn't provide trailer for imdbId: %s" % imdbId)
+                logger.info(traceback.print_exc())
         query_db.save()
         transaction.savepoint_commit(sid)
         retval = movie_db
-    except RequestException as e:
-        print(e)
-        print("Connection problem to external API")
+    except RequestException:
+        logger.error("Connection problem between server and external API. Rolling back transactions.")
+        logger.error(traceback.print_exc())
         transaction.savepoint_rollback(sid)
     except KeyError as e:
-        print(e)
-        print("KeyError")
+        logger.error("KeyError somewhere.")
+        logger.error(traceback.print_exc())
     return retval
