@@ -11,7 +11,7 @@ function searchTrailers()
     trailers_are.innerHTML = "";
 
     $('#loading').show();
-
+    $('#movie_area').hide();
     if (searchText.length === 0) {
         return false;
     }
@@ -24,23 +24,37 @@ function searchTrailers()
             'count' : searchAmount
         },
         'success' : function (data) {
-            $('#loading').hide();
-            
-            trailers_are.innerHTML += "<h2 style='display:inline-block;'>" + data['title'] + "</h2> \
-                <a style='padding-left:20px;' src='http://www.imdb.com/title/" 
-                + data['imdbid'] + "'>View in IMDb<a/><hr/>";
             console.log(data);
-            for (var trailer in data['trailers'])
-            {
-                trailers_are.innerHTML += data['trailers'][trailer]['embed'];
+            $('#loading').hide();
+            $('#poster').attr("src", data['poster']);
+            $('#movieTitle').html(data['title']);
+            $('#rating').html(data['imdbRating']);
+            $('#released').html(data['released']);
+            $('#runtime').html(data['runtime']);
+            $('#imdbLink').attr("href", data['imdbLink']);
+            $('#genre').html(data['genre']);
+            $('#director').html(data['director']);
+            $('#actors').html(data['actors']);
+            $('#plot').html(data['plot']);
+            
+            if(data['trailers'].length == 0) {
+                document.getElementById('trailers_area').innerHTML = "<h5>No trailers found!</h5>";
+            } else {
+                for (var trailer in data['trailers']) {
+                    trailers_are.innerHTML += data['trailers'][trailer]['embed'];
+                }
             }
+
+            
             var top10DateRangeSelect = document.getElementById('top10_daterange');
             var top10DateRangeSelectValue = top10DateRangeSelect[top10DateRangeSelect.selectedIndex].value;
             getTop10(top10DateRangeSelectValue);
+            $('#movie_area').show();
         },
         error: function (errormessage) {
             $('#loading').hide();
             document.getElementById('trailers_area').innerHTML = "<h1>No movies found!</h1>";
+            $('#movie_area').show();
         }
     });
 }

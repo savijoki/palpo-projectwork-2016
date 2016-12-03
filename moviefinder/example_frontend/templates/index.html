@@ -51,8 +51,25 @@
                         </span>
                     </div>
                 </div>                
-                <div id="movie_area" class="col-md-12">
-                    <div id="trailers_area"></div>
+                <div id="movie_area" class="col-md-12" style="display: none;">
+                    <div class="well">
+                        <div class="col-md-2 thumbnail pull-left" id="poster-container">
+                            <img id="poster" class="img img-responsive" alt="No image">
+                        </div>
+                        <h2 id="movieTitle" style="display: inline;"></h2><small> Imdb rating: <span id="rating"></span>/10, Released: <span id="released"></span>, Runtime: <span id="runtime"></span></small>
+                        <a id="imdbLink" class="pull-right"> View in IMDd</a>
+                        <hr/>
+                        <div class="row">
+                            <div class="col-md-4"><p><b>Genre:</b> <i id="genre"></i></p></div>
+                            <div class="col-md-4"><p><b>Director:</b> <span id="director"></span></p></div>
+                            <div class="col-md-4"><p><b>Actors:</b> <span id="actors"></span></p></div>
+                        </div>
+                        <h3>Trailers:</h3>
+                        <div id="trailers_area"></div>
+                        <h3>Plot</h3>
+                        <p id="plot"></p>
+
+                    </div>
                 </div>
             </div>
 
