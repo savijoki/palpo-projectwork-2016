@@ -51,7 +51,6 @@ class SearchByImdbId(APIView):
         count = int(request.GET.get('count', 1))
         if imdbId is None:
             return JsonResponse(json.dumps({}), safe=False, status=400)
-
         movie_db = search_and_save_movie(imdbId, count, QueryType.IMDBID)
         if movie_db is not None:
             serializer = MovieSerializer(movie_db, trailer_amount=count)
@@ -85,7 +84,8 @@ def search_and_save_movie(query, count, type):
     query = str(query).lower()
     try:
         movie_local = Movie.objects.filter(searchquery__query=query)
-        imdbId = title = ""
+        imdbId = title = poster = director = writer = released = \
+            actors = poster = genre = runtime = plot = imdbRating = ""
         if not movie_local.exists():
             url  = "http://www.omdbapi.com/?t=%s&y=&plot=full&r=json" % query
             if type is QueryType.IMDBID:
@@ -97,14 +97,36 @@ def search_and_save_movie(query, count, type):
                     logger.warning("Movie not found!")
                     return None;
                 imdbId = omdb_res.json()['imdbID']
-                title = omdb_res_json['Title']
+                title = omdb_res.json()['Title']
+                poster = omdb_res.json()['Poster']
+                director = omdb_res.json()['Director']
+                writer = omdb_res.json()['Writer']
+                actors = omdb_res.json()['Actors']
+                genre = omdb_res.json()['Genre']
+                plot = omdb_res.json()['Plot']
+                runtime = omdb_res.json()['Runtime']
+                released = omdb_res.json()['Released']
+                imdbRating = omdb_res.json()['imdbRating']
             else:
                 raise RequestException()
         else:
             title = movie_local[0].title
-            imdbId = movie_local[0].imdbid
+            imdbId = movie_local[0].imdbId
         query_db = SearchQuery(query=query)
-        movie_db, created = Movie.objects.get_or_create(imdbid=imdbId, title=title)
+        movie_db, created = Movie.objects.get_or_create(imdbId=imdbId)
+        if created:
+            movie_db.title = title
+            movie_db.poster = poster
+            movie_db.director = director
+            movie_db.writer = writer
+            movie_db.actors = actors
+            movie_db.genre = genre
+            movie_db.plot = plot
+            movie_db.runtime = runtime
+            movie_db.released = released
+            movie_db.imdbRating = imdbRating
+            movie_db.imdbLink = "http://www.imdb.com/title/%s/" % imdbId
+            movie_db.save()
         query_db.movie = movie_db
         if created or count > len(Trailer.objects.filter(movie=movie_db)):
             myapifilms_res = requests.get(

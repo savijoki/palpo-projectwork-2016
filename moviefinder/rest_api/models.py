@@ -4,13 +4,33 @@ from django.db import models
 
 class Movie(models.Model):
 
-    imdbid = models.CharField(max_length=32, blank=False, unique=True)
-    title = models.CharField(max_length=256,  blank=False)
+    imdbId = models.CharField(max_length=32, blank=False, unique=True)
+    title = models.CharField(max_length=256)
+    director = models.CharField(max_length=256)
+    writer = models.CharField(max_length=256)
+    actors = models.CharField(max_length=1024)
+    poster = models.CharField(max_length=256)
+    genre = models.CharField(max_length=256)
+    runtime = models.CharField(max_length=256)
+    released = models.CharField(max_length=32)
+    plot = models.CharField(max_length=2048)
+    imdbLink = models.CharField(max_length=256)
+    imdbRating = models.CharField(max_length=3)
 
     def as_json(self):
         return dict(
-            imdbid=self.imdbid,
-            title=self.title
+            imdbId=self.imdbId,
+            title=self.title,
+            director=self.director,
+            writer=self.director,
+            actors=self.actors,
+            poster=self.poster,
+            genre=self.genre,
+            runtime=self.runtime,
+            released=self.released,
+            plot=self.plot,
+            imdbLink=self.imdbLink,
+            imdbRating=self.imdbRating
         )
 
 
