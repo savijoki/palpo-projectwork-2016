@@ -24,7 +24,6 @@ class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         depth = 1
-        fields = ('title', 'imdbid', 'trailers',)
-
-
+        fields = ('title', 'imdbId', 'director', 'writer', 'actors', 'poster',
+                  'genre', 'runtime', 'released', 'plot', 'imdbLink', 'imdbRating', 'trailers')
 
