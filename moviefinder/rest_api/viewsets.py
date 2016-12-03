@@ -41,7 +41,7 @@ class SearchByTitle(APIView):
         if movie_db is not None:
             serializer = MovieSerializer(movie_db, trailer_amount=count)
             return Response(serializer.data)
-        return JsonResponse(json.dumps({}), safe=False, status=400)
+        return JsonResponse(json.dumps({}), safe=False, status=404)
 
 
 class SearchByImdbId(APIView):
@@ -56,7 +56,7 @@ class SearchByImdbId(APIView):
         if movie_db is not None:
             serializer = MovieSerializer(movie_db, trailer_amount=count)
             return Response(serializer.data)
-        return JsonResponse(json.dumps({}), safe=False, status=400)
+        return JsonResponse(json.dumps({}), safe=False, status=404)
 
 
 class SearchTopSearches(APIView):
@@ -93,6 +93,9 @@ def search_and_save_movie(query, count, type):
             omdb_res = requests.get(url)
             if int(omdb_res.status_code) == 200:
                 omdb_res_json = omdb_res.json()
+                if omdb_res_json.get('Error'):
+                    logger.warning("Movie not found!")
+                    return None;
                 imdbId = omdb_res.json()['imdbID']
                 title = omdb_res_json['Title']
             else:
