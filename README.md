@@ -5,6 +5,7 @@ Tässä projektissa käytetään kahta avointa RESTful rajapintaa (OMDb ja MyAPI
 
 Lopullisessa tuotteessa käyttäjä syöttää hakusanan (jonkin elokuvan nimi tai sarjan nimi tms.) hakukenttään ja tällä hakusanalla järjestelmä tekee haut OMDb -ja MyAPIFilmsin tarjoamiin rajapintoihin ja yhdistää niiden tulokset uudeksi rajapinnaksi.
 
+Rajapinta tallentaa hakuja tietokantaan tulevien vastaavien hakujen nopeuttamiseksi. Lisäksi onnistuneista hauista tallennetaan elokuvan tiedot, sekä siihen liitetään haetut trailerit. Näin ollen järjestelmä säilyttää lokaalisti elokuvien tiedot ja niihin liitetyt trailerit, jolloin yhteydenotot ulkoisiin rajapintoihin saadaan minimoitua ja omaan rajapintaan tehtyjen pyyntöjen vastausaikaa lyhennettyä.
 
 ## API
 
