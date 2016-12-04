@@ -34,6 +34,7 @@ function searchTrailers()
             $('#imdbLink').attr("href", data['imdbLink']);
             $('#genre').html(data['genre']);
             $('#director').html(data['director']);
+            $('#writer').html(data['writer']);
             $('#actors').html(data['actors']);
             $('#plot').html(data['plot']);
             
