@@ -25,7 +25,7 @@ SECRET_KEY = '4r%)@ytuc!r(r-3tih2pf9s-0tcm5^ofq#10z&rviox+l=g^se'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -116,6 +116,9 @@ CORS_ALLOW_HEADERS = (
     'access-control-allow-origin'
 )
 CORS_URLS_REGEX = r'^/api/.*$'
+
+CORS_ORIGIN_ALLOW_ALL = True
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 

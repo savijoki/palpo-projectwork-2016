@@ -24,7 +24,6 @@ function searchTrailers()
             'count' : searchAmount
         },
         'success' : function (data) {
-            console.log(data);
             $('#loading').hide();
             $('#poster').attr("src", data['poster']);
             $('#movieTitle').html(data['title']);
