@@ -104,10 +104,10 @@ $.ajax({
 
 ### Top10 (suosituimmat haut)
 
-Palauttaa json dataa suosituimmista hauista sekä hakujen lukumääristä tietyllä aikavälillä.
+Palauttaa listan json dataa suosituimmista hauista sekä hakujen lukumääristä tietyllä aikavälillä.
 
 * **URL**:
-/api/search/top?query=:days
+/api/search/top?days=:days
 
 * **Metodi**:
 GET
@@ -123,7 +123,7 @@ days=[integer]
 **Koodi**: 200
 **Sisältö**: 
 ```json
-{"title":"...","imdbId":"...","director":"...","writer":"...","actors":"...","poster":"...","genre":"...","runtime":"...","released":"...","plot":"...","imdbLink":"...","imdbRating":"...","trailers":[{"embed":"..."}]}
+[{"days": ..., "title": "...", "poster": "...", "imdbId": "...", "imdbRating": "...", "searches": ..., "imdbLink": "..."},{...}]
 ```
 
 * **Virheellinen vastaus**:
@@ -137,7 +137,7 @@ $.ajax({
     'type' : 'GET',
     'dataType': 'json',
     'data' : {
-        'query' : 7
+        'days' : 7
     },
     success: function(data) {
         console.log(data);

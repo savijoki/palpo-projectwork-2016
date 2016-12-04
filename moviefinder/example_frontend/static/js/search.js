@@ -66,7 +66,7 @@ function getTop10(days)
         'type' : 'GET',
         'dataType': 'json',
         'data' : {
-            'query' : days
+            'days' : days
         },
         'success' : function (data) {
             var top10_area = document.getElementById('top10_searches');
@@ -91,9 +91,7 @@ function getDays(index)
 function validFields()
 {   
     amount = $('#trailer_amount').val();
-    if (amount == 0) {
-        console.log("Meni");
-    } else {
+    if (amount != 0) {
         $('#search_input').removeAttr("disabled");
         $('#search_button').removeAttr("disabled");
     }
