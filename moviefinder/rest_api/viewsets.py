@@ -72,8 +72,9 @@ class SearchTopSearches(APIView):
         movie_list = []
         for query in top_queries:
             movie = Movie.objects.get(pk=int(query['movie']))
-            movie_json = movie.as_json()
+            movie_json = movie.minimal_as_json()
             movie_json['searches'] = query['sum']
+            movie_json['days'] = days
             movie_list.append(movie_json)
         return JsonResponse(json.dumps(movie_list), safe=False)
 
@@ -84,8 +85,8 @@ def search_and_save_movie(query, count, type):
     query = str(query).lower()
     try:
         movie_local = Movie.objects.filter(searchquery__query=query)
-        imdbId = title = poster = director = writer = released = \
-            actors = poster = genre = runtime = plot = imdbRating = ""
+        movie_dict = {}
+        imdbId = None
         if not movie_local.exists():
             url  = "http://www.omdbapi.com/?t=%s&y=&plot=full&r=json" % query
             if type is QueryType.IMDBID:
@@ -95,36 +96,37 @@ def search_and_save_movie(query, count, type):
                 omdb_res_json = omdb_res.json()
                 if omdb_res_json.get('Error'):
                     logger.warning("Movie not found!")
-                    return None;
-                imdbId = omdb_res.json()['imdbID']
-                title = omdb_res.json()['Title']
-                poster = omdb_res.json()['Poster']
-                director = omdb_res.json()['Director']
-                writer = omdb_res.json()['Writer']
-                actors = omdb_res.json()['Actors']
-                genre = omdb_res.json()['Genre']
-                plot = omdb_res.json()['Plot']
-                runtime = omdb_res.json()['Runtime']
-                released = omdb_res.json()['Released']
-                imdbRating = omdb_res.json()['imdbRating']
+                    return None
+                movie_dict['imdbId'] = omdb_res_json['imdbID']
+                imdbId = movie_dict['imdbId']
+                movie_dict['title'] = omdb_res_json['Title']
+                movie_dict['poster'] = omdb_res_json['Poster']
+                movie_dict['director'] = omdb_res_json['Director']
+                movie_dict['writer'] = omdb_res_json['Writer']
+                movie_dict['actors'] = omdb_res_json['Actors']
+                movie_dict['genre'] = omdb_res_json['Genre']
+                movie_dict['plot'] = omdb_res_json['Plot']
+                movie_dict['runtime'] = omdb_res_json['Runtime']
+                movie_dict['released'] = omdb_res_json['Released']
+                movie_dict['imdbRating'] = omdb_res_json['imdbRating']
             else:
                 raise RequestException()
         else:
             title = movie_local[0].title
             imdbId = movie_local[0].imdbId
         query_db = SearchQuery(query=query)
-        movie_db, created = Movie.objects.get_or_create(imdbId=imdbId)
+        movie_db, created = Movie.objects.get_or_create(imdbId=movie_dict['imdbId'])
         if created:
-            movie_db.title = title
-            movie_db.poster = poster
-            movie_db.director = director
-            movie_db.writer = writer
-            movie_db.actors = actors
-            movie_db.genre = genre
-            movie_db.plot = plot
-            movie_db.runtime = runtime
-            movie_db.released = released
-            movie_db.imdbRating = imdbRating
+            movie_db.title = movie_dict['title']
+            movie_db.poster = movie_dict['poster']
+            movie_db.director = movie_dict['director']
+            movie_db.writer = movie_dict['writer']
+            movie_db.actors = movie_dict['actors']
+            movie_db.genre = movie_dict['genre']
+            movie_db.plot = movie_dict['plot']
+            movie_db.runtime = movie_dict['runtime']
+            movie_db.released = movie_dict['released']
+            movie_db.imdbRating = movie_dict['imdbRating']
             movie_db.imdbLink = "http://www.imdb.com/title/%s/" % imdbId
             movie_db.save()
         query_db.movie = movie_db

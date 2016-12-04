@@ -22,13 +22,21 @@ class Movie(models.Model):
             imdbId=self.imdbId,
             title=self.title,
             director=self.director,
-            writer=self.director,
+            writer=self.writer,
             actors=self.actors,
             poster=self.poster,
             genre=self.genre,
             runtime=self.runtime,
             released=self.released,
             plot=self.plot,
+            imdbLink=self.imdbLink,
+            imdbRating=self.imdbRating
+        )
+    def minimal_as_json(self):
+        return dict(
+            imdbId=self.imdbId,
+            title=self.title,
+            poster=self.poster,
             imdbLink=self.imdbLink,
             imdbRating=self.imdbRating
         )
