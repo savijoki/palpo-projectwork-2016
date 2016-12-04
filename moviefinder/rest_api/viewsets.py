@@ -115,7 +115,7 @@ def search_and_save_movie(query, count, type):
             title = movie_local[0].title
             imdbId = movie_local[0].imdbId
         query_db = SearchQuery(query=query)
-        movie_db, created = Movie.objects.get_or_create(imdbId=movie_dict['imdbId'])
+        movie_db, created = Movie.objects.get_or_create(imdbId=imdbId)
         if created:
             movie_db.title = movie_dict['title']
             movie_db.poster = movie_dict['poster']
