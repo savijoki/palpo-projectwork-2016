@@ -112,7 +112,6 @@ def search_and_save_movie(query, count, type):
             else:
                 raise RequestException()
         else:
-            title = movie_local[0].title
             imdbId = movie_local[0].imdbId
         query_db = SearchQuery(query=query)
         movie_db, created = Movie.objects.get_or_create(imdbId=imdbId)

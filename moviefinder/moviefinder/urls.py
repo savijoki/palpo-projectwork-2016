@@ -21,7 +21,7 @@ from example_frontend.views import MainView
 urlpatterns = [
     url(r'^$', MainView.as_view()),
     url(r'^admin/', admin.site.urls),
-    url(r'^api/search/title/?$', SearchByTitle.as_view()),
-    url(r'^api/search/imdbId/?$', SearchByImdbId.as_view()),
-    url(r'^api/search/top/?$', SearchTopSearches.as_view()),
+    url(r'^api/search/title$', SearchByTitle.as_view()),
+    url(r'^api/search/imdbId$', SearchByImdbId.as_view()),
+    url(r'^api/search/top$', SearchTopSearches.as_view()),
 ]
