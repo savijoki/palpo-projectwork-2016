@@ -1,5 +1,7 @@
 # Palvelupohjaiset järjestelmät
-
+Harjoitustyön tekijöiden kurssin ilmoittautumiseen käyttämät sähköpostit:
+aleksi.savijoki@student.tut.fi
+tuomas.a.aho@student.tut.fi
 ## Projektisuunnitelma
 Tässä projektissa käytetään kahta avointa RESTful rajapintaa (OMDb ja MyAPIFilms) ja näistä saadut tiedot yhdistetään ja tarjotaan ulospäin oma RESTful rajapinta. Projekti tullaan toteuttamaan käyttämällä Djangoa.
 
